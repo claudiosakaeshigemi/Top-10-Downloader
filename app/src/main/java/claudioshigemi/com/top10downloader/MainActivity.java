@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: iniciando ASynctask");
         DownloadData downloadData = new DownloadData();
-        downloadData.execute("URL vai aqui.");
+        downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml");
         Log.d(TAG, "onCreate: terminado.");
 
     }
@@ -91,8 +91,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, " downloadXML: invalido URL --> " + e.getMessage() );
             }catch (IOException e){
                 Log.e(TAG, " downloadXML: IO Exception na leitura de dados --> " + e.getMessage() );
+            }catch (SecurityException e){
+                Log.e(TAG, "downloadXML: Seguranca da Internet. Necessita de Permissão? " + e.getMessage()  );
+                e.printStackTrace();
             }
-            return  null; 
+            return  null;
 
         }
 
