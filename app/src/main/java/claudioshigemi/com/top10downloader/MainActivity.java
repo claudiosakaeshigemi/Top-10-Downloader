@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,11 +21,14 @@ public class MainActivity extends AppCompatActivity {
     //    Logt = cria a linha abaixo
     private static final String TAG = "MainActivity";
 
+    private ListView listApps;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        listApps = (ListView) findViewById(R.id.xmlListView);
 
         Log.d(TAG, "onCreate: iniciando ASynctask");
         DownloadData downloadData = new DownloadData();
@@ -34,14 +39,22 @@ public class MainActivity extends AppCompatActivity {
 
 
     private class DownloadData extends AsyncTask<String, Void, String> {
-//            Ctrl + O = para criar  Override  de métodos  
-
+//            Ctrl + O = para criar  Override  de métodos
         private static final String TAG = "DownloadData";
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             Log.d(TAG, "onPostExecute:  parametro é -->   " + s);
+
+            ParseApplications parseApplications = new ParseApplications();
+            parseApplications.parse(s);
+
+            ArrayAdapter<FeedEntry> arrayAdapter = new ArrayAdapter<FeedEntry>(
+                    MainActivity.this, R.layout.list_item, parseApplications.getApplications());
+            listApps.setAdapter(arrayAdapter);
+
+
         }
 
         @Override
@@ -56,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             return rssFeed;
         }
 
-        private  String downloadXML(String urlPath){
+        private String downloadXML(String urlPath) {
             StringBuilder xmlResult = new StringBuilder();
 
             try {
@@ -69,33 +82,32 @@ public class MainActivity extends AppCompatActivity {
 //                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
 //                BufferedReader reader = new BufferedReader(inputStreamReader);
 
-                BufferedReader reader =  new BufferedReader( new InputStreamReader(connection.getInputStream()));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
                 int charsRead;
                 char[] inputBuffer = new char[500];
-
-                while (true){
+                while(true) {
                     charsRead = reader.read(inputBuffer);
-                    if (charsRead < 0){
+                    if(charsRead < 0) {
                         break;
                     }
-                    if (charsRead > 0 ){
-                        xmlResult.append(String.copyValueOf(inputBuffer,0,charsRead )) ;
+                    if(charsRead > 0) {
+                        xmlResult.append(String.copyValueOf(inputBuffer, 0, charsRead));
                     }
                 }
                 reader.close();
 
 
-                return  xmlResult.toString();
-            }catch (MalformedURLException e){
-                Log.e(TAG, " downloadXML: invalido URL --> " + e.getMessage() );
-            }catch (IOException e){
-                Log.e(TAG, " downloadXML: IO Exception na leitura de dados --> " + e.getMessage() );
-            }catch (SecurityException e){
-                Log.e(TAG, "downloadXML: Seguranca da Internet. Necessita de Permissão? " + e.getMessage()  );
+                return xmlResult.toString();
+            } catch (MalformedURLException e) {
+                Log.e(TAG, " downloadXML: invalido URL --> " + e.getMessage());
+            } catch (IOException e) {
+                Log.e(TAG, " downloadXML: IO Exception na leitura de dados --> " + e.getMessage());
+            } catch (SecurityException e) {
+                Log.e(TAG, "downloadXML: Seguranca da Internet. Necessita de Permissão? " + e.getMessage());
                 e.printStackTrace();
             }
-            return  null;
+            return null;
 
         }
 
