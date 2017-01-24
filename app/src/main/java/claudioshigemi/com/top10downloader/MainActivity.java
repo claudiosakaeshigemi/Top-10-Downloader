@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             ParseApplications parseApplications = new ParseApplications();
             parseApplications.parse(s);
 
-            FeedAdapter feedAdapter = new FeedAdapter(MainActivity.this,R.layout.list_record,
+            FeedAdapter feedAdapter = new FeedAdapter(MainActivity.this, R.layout.list_record,
                     parseApplications.getApplications());
             listApps.setAdapter(feedAdapter);
 
