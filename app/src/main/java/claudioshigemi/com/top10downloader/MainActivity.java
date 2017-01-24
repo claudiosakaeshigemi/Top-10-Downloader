@@ -25,15 +25,49 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.feeds_menu,menu);
+        return  true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        String feedUrl;
+
+        switch (id){
+            case R.id.menuFree:
+                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml";
+                break;
+            case R.id.menuPaid:
+                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/toppaidapplications/limit=10/xml";
+                break;
+            case R.id.menuSongs:
+                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topsongs/limit=10/xml";
+                break;
+            default:
+                return  super.onOptionsItemSelected(item);
+        }
+
+        downloadUrl(feedUrl);
+        return  true;
+    }
+
+    private void downloadUrl(String feedUrl) {
+
+        Log.d(TAG, "downloadUrl: iniciando ASynctask");
+        DownloadData downloadData = new DownloadData();
+        downloadData.execute(feedUrl);
+        Log.d(TAG, "downloadUrl: terminado.");
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listApps = (ListView) findViewById(R.id.xmlListView);
-
-        Log.d(TAG, "onCreate: iniciando ASynctask");
-        DownloadData downloadData = new DownloadData();
-        downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml");
-        Log.d(TAG, "onCreate: terminado.");
+        downloadUrl("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml");
 
     }
 
@@ -45,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Log.d(TAG, "onPostExecute:  parametro é -->   " + s);
+//            Log.d(TAG, "onPostExecute:  parametro é -->   " + s);
 
             ParseApplications parseApplications = new ParseApplications();
             parseApplications.parse(s);
